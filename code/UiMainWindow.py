@@ -1,5 +1,5 @@
 # Form implementation generated from reading ui file 'mainwindow.ui'
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 from ElectionTable import ElectionTable
 
 

@@ -1,5 +1,7 @@
 import re
 from PyQt5 import QtWidgets, QtCore, QtGui
+from Columns import Columns
+from ChangeItemDialog import ChangeItemDialog
 from gen_message_box import gen_message_box
 
 
@@ -8,13 +10,18 @@ class ElectionTable(QtWidgets.QTableWidget):
         super(ElectionTable, self).__init__()
         self.setParent(parent)
         self.setGeometry(geometry)
+        self.edit_dict: dict[tuple[int, int], bool] = {}
 
         # Set rows and columns
         self.setRowCount(rows)
         self.setColumnCount(columns)
         self.initialize_rows()
+        self.generate_edit_dict()
+
+        # Set edit triggers
         if not can_edit:
             self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+            self.itemClicked.connect(self.item_clicked)
 
         # Set font
         font = QtGui.QFont()
@@ -49,14 +56,38 @@ class ElectionTable(QtWidgets.QTableWidget):
                 item = QtWidgets.QTableWidgetItem()
                 self.setItem(row_position, x, item)
                 self.item(row_position, x).setText(table_row.item(0, x).text())
+                if x <= Columns.ELECTORATE.value:
+                    self.edit_dict.update({(row_position, x): True})
+                else:
+                    self.edit_dict.update({(row_position, x): False})
         else:
             gen_message_box("Invalid input!", "Votes and electorates must be integers.",
                             QtWidgets.QMessageBox.Icon.Warning)
 
     def delete_row(self):
         if self.rowCount() > 1:
+            deleted_row: int = self.rowCount()
             self.removeRow(self.rowCount() - 1)
+            for x in range(self.columnCount()):
+                self.edit_dict.pop((deleted_row, x))
+
+    def generate_edit_dict(self):
+        for x in range(self.rowCount()):
+            for y in range(self.columnCount()):
+                if y <= Columns.ELECTORATE.value:
+                    self.edit_dict.update({(x, y): True})
+                else:
+                    self.edit_dict.update({(x, y): False})
 
     def clear_table(self):
         for x in range(self.rowCount() - 1):
             self.delete_row()
+
+    @staticmethod
+    def item_clicked(item: QtWidgets.QTableWidgetItem):
+        if item.column() <= Columns.ELECTORATE.value and item.row() > 0:
+            if item.column() > Columns.PARTY.value:
+                change_item_dialog = ChangeItemDialog(item, True)
+            else:
+                change_item_dialog = ChangeItemDialog(item, False)
+            change_item_dialog.exec()
