@@ -6,7 +6,7 @@ from ElectionTable import ElectionTable
 class UiMainWindow(object):
     def setup_ui(self, main_window):
         main_window.setObjectName("main_window")
-        main_window.resize(610, 415)
+        main_window.resize(610, 420)
         self.central_widget = QtWidgets.QWidget(main_window)
         self.central_widget.setObjectName("central_widget")
         self.election_table = ElectionTable(self.central_widget, QtCore.QRect(10, 10, 410, 320), 1, 5, False)
