@@ -1,5 +1,6 @@
 from PyQt5 import QtWidgets
 from UiMainWindow import UiMainWindow
+from LargestAverageMethod import LargestAverageMethod
 
 
 class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
@@ -8,16 +9,16 @@ class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
         self.setup_ui(self)
 
         # Process options
-        self.has_threshold: bool = self.enable_threshold_option.isChecked()
+        self.options: dict[str, bool] = {"threshold": self.enable_threshold_option.isChecked(),
+                                              "tag_along": self.enable_tag_along_option.isChecked(),
+                                              "overhang": self.enable_overhang_option.isChecked(),
+                                              "levelling": self.enable_levelling_option.isChecked()}
         self.threshold: int = self.threshold_num.value()
-        self.has_tag_along: bool = self.enable_tag_along_option.isChecked()
         self.tag_along_seats: int = self.tag_along_num.value()
-        self.has_overhang: bool = self.enable_overhang_option.isChecked()
-        self.has_levelling: bool = self.enable_levelling_option.isChecked()
 
-        if not self.has_threshold:
+        if not self.options["threshold"]:
             self.threshold_num.setDisabled(True)
-        if not self.has_tag_along:
+        if not self.options["tag_along"]:
             self.tag_along_num.setDisabled(True)
 
         # Connect to change_options
@@ -33,22 +34,27 @@ class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
         # Connect spin boxes to value variables
         self.threshold_num.valueChanged.connect(self.set_threshold)
         self.tag_along_num.valueChanged.connect(self.set_tag_along)
+        self.calculate_button.clicked.connect(self.calculate)
 
     def change_options(self, option: str, toggled_on: bool):
+        self.options[option] = toggled_on
+
         match option:
             case "threshold":
-                self.has_threshold = toggled_on
                 self.threshold_num.setEnabled(toggled_on)
             case "tag_along":
-                self.has_tag_along = toggled_on
                 self.tag_along_num.setEnabled(toggled_on)
-            case "overhang":
-                self.has_overhang = toggled_on
-            case "levelling":
-                self.has_levelling = toggled_on
+            case _:
+                pass
 
     def set_threshold(self):
-        self.threshold = self.threshold_num.value()
+        self.threshold = self.threshold_num.value() / 100
 
     def set_tag_along(self):
         self.tag_along_seats = self.threshold_num.value()
+
+    def calculate(self):
+        dhondt = LargestAverageMethod(self.election_table.generate_party_dict(), (int(self.electorate_input.text()) +
+                                      int(self.list_input.text())), 1, self.options, self.threshold,
+                                      self.tag_along_seats)
+        print(dhondt.calculate_seats())

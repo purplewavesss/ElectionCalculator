@@ -49,6 +49,8 @@ class ElectionTable(QtWidgets.QTableWidget):
     def append_row(self, table_row: QtWidgets.QTableWidget):
         for x in range(table_row.columnCount()):
             table_row.item(0, x).setText(re.sub(",", "", table_row.item(0, x).text()))
+        if table_row.item(0, Columns.ELECTORATE.value).text() == "":
+            table_row.item(0, Columns.ELECTORATE.value).setText("0")
         if str(table_row.item(0, 1).text()).isdecimal() and str(table_row.item(0, 2).text()).isdecimal():
             row_position = self.rowCount()
             self.insertRow(row_position)
@@ -82,6 +84,16 @@ class ElectionTable(QtWidgets.QTableWidget):
     def clear_table(self):
         for x in range(self.rowCount() - 1):
             self.delete_row()
+
+    def generate_party_dict(self) -> dict[str, dict[str, int]]:
+        party_dict: dict[str, dict[str, int]] = {}
+        for x in range(self.rowCount()):
+            if x != 0:
+                # Creates a dict of {party_name: {votes, electorates}}
+                party_dict.update({self.item(x, Columns.PARTY.value).text(): {"votes":
+                                  int(self.item(x, Columns.VOTES.value).text()), "electorates":
+                                  int(self.item(x, Columns.ELECTORATE.value).text())}})
+        return party_dict
 
     @staticmethod
     def item_clicked(item: QtWidgets.QTableWidgetItem):
