@@ -10,9 +10,9 @@ class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
 
         # Process options
         self.options: dict[str, bool] = {"threshold": self.enable_threshold_option.isChecked(),
-                                              "tag_along": self.enable_tag_along_option.isChecked(),
-                                              "overhang": self.enable_overhang_option.isChecked(),
-                                              "levelling": self.enable_levelling_option.isChecked()}
+                                         "tag_along": self.enable_tag_along_option.isChecked(),
+                                         "overhang": self.enable_overhang_option.isChecked(),
+                                         "levelling": self.enable_levelling_option.isChecked()}
         self.threshold: int = self.threshold_num.value()
         self.tag_along_seats: int = self.tag_along_num.value()
 
@@ -44,17 +44,28 @@ class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
                 self.threshold_num.setEnabled(toggled_on)
             case "tag_along":
                 self.tag_along_num.setEnabled(toggled_on)
+            case "overhang":
+                if toggled_on:
+                    self.enable_levelling_option.setChecked(not toggled_on)
+                    self.disable_levelling_option.setChecked(toggled_on)
+                    self.options["levelling"] = not toggled_on
+            case "levelling":
+                if toggled_on:
+                    self.enable_overhang_option.setChecked(not toggled_on)
+                    self.disable_overhang_option.setChecked(toggled_on)
+                    self.options["overhang"] = not toggled_on
             case _:
-                pass
+                raise ValueError("Incorrect option choice!")
 
     def set_threshold(self):
         self.threshold = self.threshold_num.value() / 100
 
     def set_tag_along(self):
-        self.tag_along_seats = self.threshold_num.value()
+        self.tag_along_seats = self.tag_along_num.value()
 
     def calculate(self):
-        dhondt = LargestAverageMethod(self.election_table.generate_party_dict(), (int(self.electorate_input.text()) +
-                                      int(self.list_input.text())), 1, self.options, self.threshold,
-                                      self.tag_along_seats)
-        print(dhondt.calculate_seats())
+        d_hondt = LargestAverageMethod(self.election_table.generate_party_dict(), (int(self.electorate_input.text()) +
+                                       int(self.list_input.text())), self.options, self.threshold, self.tag_along_seats,
+                                       1)
+        seats_dict = d_hondt.calculate_seats()
+        print(d_hondt.calculate_party_dict(seats_dict))

@@ -7,8 +7,7 @@ from gen_message_box import gen_message_box
 
 class ElectionTable(QtWidgets.QTableWidget):
     def __init__(self, parent: QtWidgets.QWidget, geometry: QtCore.QRect, rows: int, columns: int, can_edit: bool):
-        super(ElectionTable, self).__init__()
-        self.setParent(parent)
+        super(ElectionTable, self).__init__(parent)
         self.setGeometry(geometry)
         self.edit_dict: dict[tuple[int, int], bool] = {}
 
