@@ -14,6 +14,7 @@ class ChangeItemDialog(QtWidgets.QDialog, UiChangeItemDialog):
         self.button_box.rejected.connect(self.reject)
 
     def change_item(self):
+        # Checks if input is valid
         if self.is_decimal:
             if self.content_line_edit.text().isdecimal():
                 self.item.setText(self.content_line_edit.text())

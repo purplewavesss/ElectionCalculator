@@ -8,10 +8,11 @@ class LargestAverageMethod(ElectionMethod):
         self.divisor: float = _divisor
 
     def calculate_seats(self, valid_vote_dict: dict[str, float] = None) -> dict[str, int]:
+        """Returns dictionary of number of seats each party should qualify for"""
         seats_dict: dict[str, int] = self.gen_seats_dict(self.party_dict)
 
         if valid_vote_dict is None:
-            valid_vote_dict = self.remove_invalid_parties()
+            valid_vote_dict: dict[str, float] = self.remove_invalid_parties()
 
         for x in range(self.seats):
             max_value = max(valid_vote_dict, key=valid_vote_dict.get)

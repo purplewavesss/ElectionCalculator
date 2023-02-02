@@ -34,6 +34,7 @@ class ElectionTable(QtWidgets.QTableWidget):
         self.verticalHeader().setDefaultSectionSize(35)
 
     def initialize_rows(self):
+        """Fills a table with blank items"""
         for x in range(self.rowCount()):
             item = QtWidgets.QTableWidgetItem()
             self.setVerticalHeaderItem(x, item)
@@ -46,17 +47,28 @@ class ElectionTable(QtWidgets.QTableWidget):
                 self.setItem(y, x, item)
 
     def append_row(self, table_row: QtWidgets.QTableWidget):
+        """Adds a one-row table to an election table"""
+        # Remove commas from input
         for x in range(table_row.columnCount()):
             table_row.item(0, x).setText(re.sub(",", "", table_row.item(0, x).text()))
-        if table_row.item(0, Columns.ELECTORATE.value).text() == "":
+
+        # Zero out empty values
+        if (table_row.item(0, Columns.ELECTORATE.value).text() or table_row.item(0, Columns.TOTAL.value).text()) \
+                == "":
             table_row.item(0, Columns.ELECTORATE.value).setText("0")
+
+        # Check if input is valid for row added
         if str(table_row.item(0, 1).text()).isdecimal() and str(table_row.item(0, 2).text()).isdecimal():
             row_position = self.rowCount()
+
+            # Insert and fill row
             self.insertRow(row_position)
             for x in range(table_row.columnCount()):
                 item = QtWidgets.QTableWidgetItem()
                 self.setItem(row_position, x, item)
                 self.item(row_position, x).setText(table_row.item(0, x).text())
+
+                # Check if items are editable
                 if x <= Columns.ELECTORATE.value:
                     self.edit_dict.update({(row_position, x): True})
                 else:
@@ -67,12 +79,14 @@ class ElectionTable(QtWidgets.QTableWidget):
 
     def delete_row(self):
         if self.rowCount() > 1:
-            deleted_row: int = self.rowCount()
-            self.removeRow(self.rowCount() - 1)
+            deleted_row: int = self.rowCount() - 1
+            self.removeRow(deleted_row)
             for x in range(self.columnCount()):
-                self.edit_dict.pop((deleted_row, x))
+                if x <= Columns.ELECTORATE.value:
+                    self.edit_dict.pop((deleted_row, x))
 
     def generate_edit_dict(self):
+        """Generates a dictionary determining whether items are editable"""
         for x in range(self.rowCount()):
             for y in range(self.columnCount()):
                 if y <= Columns.ELECTORATE.value:
@@ -81,10 +95,12 @@ class ElectionTable(QtWidgets.QTableWidget):
                     self.edit_dict.update({(x, y): False})
 
     def clear_table(self):
+        """Deletes every table row except for the headers"""
         for x in range(self.rowCount() - 1):
             self.delete_row()
 
     def generate_party_dict(self) -> dict[str, dict[str, int]]:
+        """Generates dictionary containing party info"""
         party_dict: dict[str, dict[str, int]] = {}
         for x in range(self.rowCount()):
             if x != 0:
@@ -94,9 +110,13 @@ class ElectionTable(QtWidgets.QTableWidget):
                                   int(self.item(x, Columns.ELECTORATE.value).text())}})
         return party_dict
 
-    @staticmethod
-    def item_clicked(item: QtWidgets.QTableWidgetItem):
-        if item.column() <= Columns.ELECTORATE.value and item.row() > 0:
+    def set_value(self, rows: int, columns: int, text: str):
+        item = QtWidgets.QTableWidgetItem()
+        item.setText(text)
+        self.setItem(rows, columns, item)
+
+    def item_clicked(self, item: QtWidgets.QTableWidgetItem):
+        if (item.column(), item.row()) in self.edit_dict:
             if item.column() > Columns.PARTY.value:
                 change_item_dialog = ChangeItemDialog(item, True)
             else:

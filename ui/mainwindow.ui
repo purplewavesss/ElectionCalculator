@@ -386,8 +386,8 @@
    <widget class="QLineEdit" name="electorate_input">
     <property name="geometry">
      <rect>
-      <x>505</x>
-      <y>210</y>
+      <x>500</x>
+      <y>200</y>
       <width>95</width>
       <height>20</height>
      </rect>
@@ -396,9 +396,9 @@
    <widget class="QLabel" name="electorate_label">
     <property name="geometry">
      <rect>
-      <x>430</x>
-      <y>210</y>
-      <width>65</width>
+      <x>425</x>
+      <y>200</y>
+      <width>70</width>
       <height>20</height>
      </rect>
     </property>
@@ -409,8 +409,8 @@
    <widget class="QLineEdit" name="list_input">
     <property name="geometry">
      <rect>
-      <x>505</x>
-      <y>240</y>
+      <x>500</x>
+      <y>230</y>
       <width>95</width>
       <height>20</height>
      </rect>
@@ -419,9 +419,9 @@
    <widget class="QLabel" name="list_label">
     <property name="geometry">
      <rect>
-      <x>430</x>
-      <y>240</y>
-      <width>65</width>
+      <x>425</x>
+      <y>230</y>
+      <width>70</width>
       <height>20</height>
      </rect>
     </property>
@@ -453,6 +453,29 @@
     </property>
     <property name="text">
      <string>Calculate</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="total_label">
+    <property name="geometry">
+     <rect>
+      <x>425</x>
+      <y>260</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Total Seats</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="total_input">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>260</y>
+      <width>95</width>
+      <height>20</height>
+     </rect>
     </property>
    </widget>
   </widget>
