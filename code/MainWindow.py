@@ -2,6 +2,7 @@ from PyQt5 import QtWidgets
 from UiMainWindow import UiMainWindow
 from LargestAverageMethod import LargestAverageMethod
 from Columns import Columns
+from SeatAllocation import SeatAllocation
 from gen_message_box import gen_message_box
 
 
@@ -17,6 +18,7 @@ class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
                                          "levelling": self.enable_levelling_option.isChecked()}
         self.threshold: int = self.threshold_num.value()
         self.tag_along_seats: int = self.tag_along_num.value()
+        self.seat_allocation: SeatAllocation = SeatAllocation(self.electorate_input, self.list_input, self.total_input)
 
         self.connect_objects()
 
@@ -42,8 +44,12 @@ class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
         self.calculate_button.clicked.connect(self.calculate)
 
         # Connect line edits to triggers
-        self.electorate_input.editingFinished.connect(self.seat_value_changed)
-        self.list_input.editingFinished.connect(self.seat_value_changed)
+        self.electorate_input.editingFinished.connect(lambda: self.calculate_button.setEnabled(
+            self.seat_allocation.seat_value_changed()))
+        self.list_input.editingFinished.connect(lambda: self.calculate_button.setEnabled(
+            self.seat_allocation.seat_value_changed()))
+        self.total_input.editingFinished.connect(lambda: self.calculate_button.setEnabled(
+            self.seat_allocation.total_seats_changed()))
 
         self.calculate_button.setDisabled(True)
 
@@ -76,37 +82,30 @@ class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
     def set_tag_along(self):
         self.tag_along_seats = self.tag_along_num.value()
 
-    def seat_value_changed(self):
-        """Changes total_input to value of both inputs"""
-        if self.electorate_input.text().isdecimal() and self.list_input.text().isdecimal():
-            self.total_input.setText(str(int(self.electorate_input.text()) + int(self.list_input.text())))
-            if not self.calculate_button.isEnabled():
-                self.calculate_button.setEnabled(True)
-        elif (self.electorate_input.text() == "" and self.list_input.text().isdecimal()) or (
-                self.list_input.text() == "" and self.electorate_input.text().isdecimal()):
-            if self.electorate_input.text() == "":
-                self.electorate_input.setText("0")
-                self.total_input.setText(str(int(self.electorate_input.text()) + int(self.list_input.text())))
-            elif self.list_input.text() == "":
-                self.list_input.setText("0")
-                self.total_input.setText(str(int(self.electorate_input.text()) + int(self.list_input.text())))
-        else:
-            self.calculate_button.setEnabled(False)
-            gen_message_box("Invalid seat value", "Number of seats must be an integer.",
-                            QtWidgets.QMessageBox.Icon.Warning)
-
     def calculate(self):
         """Calculates and displays election results"""
-        d_hondt = LargestAverageMethod(self.election_table.generate_party_dict(), (int(self.electorate_input.text()) +
-                                       int(self.list_input.text())), self.options, self.threshold, self.tag_along_seats,
-                                       1)
-        seats_dict = d_hondt.calculate_seats()
-        results = d_hondt.calculate_party_dict(seats_dict)
+        election_data: dict[str, dict[str, int]] = self.election_table.generate_party_dict()
+        electorates = 0
 
-        # Show results in table
-        for x in range(self.election_table.rowCount()):
-            if x != 0:
-                self.election_table.set_value(x, Columns.LIST.value, str(results[self.election_table.item(x, 0).text()]
-                                                                         ["list"]))
-                self.election_table.set_value(x, Columns.TOTAL.value, str(results[self.election_table.item(x, 0).text()]
-                                                                          ["total"]))
+        for party in election_data.values():
+            electorates += party["electorates"]
+
+        # Run elections
+        if self.seat_allocation.get_electorates() == electorates:
+            d_hondt = LargestAverageMethod(election_data, self.seat_allocation.get_total_seats(), self.options,
+                                           self.threshold, self.tag_along_seats, 1)
+            seats_dict = d_hondt.calculate_seats()
+            results = d_hondt.calculate_party_dict(seats_dict)
+
+            # Show results in table
+            for x in range(self.election_table.rowCount()):
+                if x != 0:
+                    self.election_table.set_value(x, Columns.LIST.value,
+                                                  str(results[self.election_table.item(x, 0).text()]["list"]))
+                    self.election_table.set_value(x, Columns.TOTAL.value,
+                                                  str(results[self.election_table.item(x, 0).text()]["total"]))
+
+        else:
+            gen_message_box("Invalid electorate number!", "The number of electorates for the election does not match "
+                                                          "the number of electorates earned by parties.",
+                                                          QtWidgets.QMessageBox.Icon.Warning)
