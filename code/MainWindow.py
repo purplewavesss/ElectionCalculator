@@ -1,9 +1,9 @@
 from PyQt5 import QtWidgets
 from UiMainWindow import UiMainWindow
-from LargestAverageMethod import LargestAverageMethod
 from Columns import Columns
 from SeatAllocation import SeatAllocation
 from gen_message_box import gen_message_box
+from HighestRemainderMethod import HighestRemainderMethod
 
 
 class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
@@ -92,10 +92,10 @@ class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
 
         # Run elections
         if self.seat_allocation.get_electorates() == electorates:
-            d_hondt = LargestAverageMethod(election_data, self.seat_allocation.get_total_seats(), self.options,
-                                           self.threshold, self.tag_along_seats, 1)
-            seats_dict = d_hondt.calculate_seats()
-            results = d_hondt.calculate_party_dict(seats_dict)
+            hare = HighestRemainderMethod(election_data, self.seat_allocation.get_total_seats(), self.options,
+                                          self.threshold, self.tag_along_seats, 0, False)
+            seats_dict = hare.calculate_seats()
+            results = hare.calculate_party_dict(seats_dict)
 
             # Show results in table
             for x in range(self.election_table.rowCount()):
