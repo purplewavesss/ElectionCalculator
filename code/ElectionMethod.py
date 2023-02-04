@@ -59,7 +59,7 @@ class ElectionMethod(ABC):
         return self.party_dict
 
     @abstractmethod
-    def calculate_seats(self, valid_vote_dict: dict[str, float] = None) -> dict[str, int]:
+    def calculate_seats(self, valid_vote_dict: dict[str, int] = None) -> dict[str, int]:
         pass
 
     @staticmethod
@@ -93,6 +93,15 @@ class ElectionMethod(ABC):
             seats_dict.update({key: 0})
 
         return seats_dict
+
+    @staticmethod
+    def gen_remainder_dict(valid_vote_dict: dict[str, int]) -> dict[str, float]:
+        remainder_dict: dict[str, float] = {}
+
+        for party in remainder_dict.keys():
+            remainder_dict.update({party: 0})
+
+        return remainder_dict
 
     @staticmethod
     def threshold_check(threshold: float, party_votes: int, total_votes: int) -> bool:
