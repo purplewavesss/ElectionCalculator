@@ -29,8 +29,7 @@ class HighestRemainderMethod(ElectionMethod):
 
         if len(seats_dict) > 1:
             for x in range(self.seats - sum(seats_dict.values())):
-                if len(remainder_dict.keys()) > 0:
-                    seats_dict[max(remainder_dict, key=remainder_dict.get)] += 1
-                    remainder_dict.pop(max(remainder_dict, key=remainder_dict.get))
+                seats_dict[max(remainder_dict, key=remainder_dict.get)] += 1
+                remainder_dict.pop(max(remainder_dict, key=remainder_dict.get))
 
         return seats_dict

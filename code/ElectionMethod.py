@@ -38,16 +38,17 @@ class ElectionMethod(ABC):
                 overhang_parties.update({party: results[party]})
 
         # Removes list seats to account for overhang seats if needed
-        if not self.options["overhang"] and not self.options["levelling"]:
+        if not self.options["overhang"]:
             self.seats -= overhang_party_seats
             for key in overhang_parties.keys():
                 valid_vote_dict.pop(key)
             results = self.calculate_seats(valid_vote_dict)
             for key in overhang_parties.keys():
                 results.update({key: overhang_parties[key]})
+            self.seats += overhang_party_seats
 
         # Adds levelling seats if needed
-        elif self.options["levelling"] and overhang_party_seats:
+        if self.options["levelling"] and overhang_party_seats > 0:
             self.seats = self.calculate_levelling(self.remove_invalid_parties(), results, self.seats)
             results = self.calculate_seats()
 
@@ -65,7 +66,7 @@ class ElectionMethod(ABC):
     @staticmethod
     def calculate_levelling(vote_dict: dict[str, int], seats_dict: dict[str, int], seats: int) -> int:
         """Calculates number of seats with added levelling"""
-        diff: float = 1.00000
+        diff: float = 1
 
         # Calculate difference between number of seats and number of votes
         for party in seats_dict.keys():
@@ -73,7 +74,7 @@ class ElectionMethod(ABC):
             votes_percentage: float = vote_dict[party] / sum(vote_dict.values())
             diff = max(diff, (seats_percentage / votes_percentage))
 
-        seats = math.ceil(seats * diff)
+        seats = int(seats * diff)
         return seats
 
     @staticmethod
@@ -98,8 +99,8 @@ class ElectionMethod(ABC):
     def gen_remainder_dict(valid_vote_dict: dict[str, int]) -> dict[str, float]:
         remainder_dict: dict[str, float] = {}
 
-        for party in remainder_dict.keys():
-            remainder_dict.update({party: 0})
+        for party in valid_vote_dict.keys():
+            valid_vote_dict.update({party: 0})
 
         return remainder_dict
 
