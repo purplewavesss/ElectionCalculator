@@ -27,8 +27,8 @@ class HighestRemainderMethod(ElectionMethod):
             seats_dict[party] = math.floor(allocated_seats)
             remainder_dict[party] = allocated_seats - math.floor(allocated_seats)
 
-        if len(remainder_dict) > 0:
-            for x in range(self.seats - sum(seats_dict.values())):
+        for x in range(self.seats - sum(seats_dict.values())):
+            if max(remainder_dict, key=remainder_dict.get) is not None:
                 seats_dict[max(remainder_dict, key=remainder_dict.get)] += 1
                 remainder_dict.pop(max(remainder_dict, key=remainder_dict.get))
 
