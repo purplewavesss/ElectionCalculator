@@ -2,14 +2,18 @@ import re
 from PyQt5 import QtWidgets, QtCore, QtGui
 from Columns import Columns
 from ChangeItemDialog import ChangeItemDialog
+from SeatAllocation import SeatAllocation
 from gen_message_box import gen_message_box
 
 
 class ElectionTable(QtWidgets.QTableWidget):
-    def __init__(self, parent: QtWidgets.QWidget, geometry: QtCore.QRect, rows: int, columns: int, can_edit: bool):
+    def __init__(self, parent: QtWidgets.QWidget, geometry: QtCore.QRect, rows: int, columns: int, can_edit: bool,
+                 _seat_allocation: SeatAllocation):
         super(ElectionTable, self).__init__(parent)
         self.setGeometry(geometry)
         self.edit_dict: dict[tuple[int, int], bool] = {}
+        self.seat_allocation: SeatAllocation = _seat_allocation
+        self.table_electorates: int = 0
 
         # Set rows and columns
         self.setRowCount(rows)
@@ -19,7 +23,7 @@ class ElectionTable(QtWidgets.QTableWidget):
 
         # Set edit triggers
         if not can_edit:
-            self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+            self.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
             self.itemClicked.connect(self.item_clicked)
 
         # Set font
@@ -58,7 +62,8 @@ class ElectionTable(QtWidgets.QTableWidget):
             table_row.item(0, Columns.ELECTORATE.value).setText("0")
 
         # Check if input is valid for row added
-        if str(table_row.item(0, 1).text()).isdecimal() and str(table_row.item(0, 2).text()).isdecimal():
+        if str(table_row.item(0, Columns.VOTES.value).text()).isdecimal() and \
+                str(table_row.item(0, Columns.ELECTORATE.value).text()).isdecimal():
             row_position = self.rowCount()
 
             # Insert and fill row
@@ -73,6 +78,11 @@ class ElectionTable(QtWidgets.QTableWidget):
                     self.edit_dict.update({(row_position, x): True})
                 else:
                     self.edit_dict.update({(row_position, x): False})
+
+            # Add to table_electorates
+            self.table_electorates += int(table_row.item(0, Columns.ELECTORATE.value).text())
+            self.electorate_increase()
+
         else:
             gen_message_box("Invalid input!", "Votes and electorates must be integers.",
                             QtWidgets.QMessageBox.Icon.Warning)
@@ -80,6 +90,7 @@ class ElectionTable(QtWidgets.QTableWidget):
     def delete_row(self):
         if self.rowCount() > 1:
             deleted_row: int = self.rowCount() - 1
+            self.table_electorates -= int(self.item(deleted_row, Columns.ELECTORATE.value).text())
             self.removeRow(deleted_row)
             for x in range(self.columnCount()):
                 if x <= Columns.ELECTORATE.value:
@@ -122,3 +133,12 @@ class ElectionTable(QtWidgets.QTableWidget):
             else:
                 change_item_dialog = ChangeItemDialog(item, False)
             change_item_dialog.exec()
+
+    def electorate_increase(self):
+        try:
+            if self.table_electorates > self.seat_allocation.get_electorates():
+                self.seat_allocation.set_electorates(self.table_electorates)
+                self.seat_allocation.seat_value_changed()
+        except ValueError:
+            self.seat_allocation.set_electorates(self.table_electorates)
+            self.seat_allocation.seat_value_changed()

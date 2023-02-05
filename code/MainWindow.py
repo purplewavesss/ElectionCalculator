@@ -1,7 +1,6 @@
 from PyQt5 import QtWidgets
 from UiMainWindow import UiMainWindow
 from Columns import Columns
-from SeatAllocation import SeatAllocation
 from gen_message_box import gen_message_box
 from HighestRemainderMethod import HighestRemainderMethod
 
@@ -18,7 +17,6 @@ class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
                                          "levelling": self.enable_levelling_option.isChecked()}
         self.threshold: int = self.threshold_num.value()
         self.tag_along_seats: int = self.tag_along_num.value()
-        self.seat_allocation: SeatAllocation = SeatAllocation(self.electorate_input, self.list_input, self.total_input)
 
         self.connect_objects()
 
