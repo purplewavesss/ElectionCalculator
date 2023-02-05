@@ -9,7 +9,8 @@ class UiChangeItemDialog(object):
         self.button_box = QtWidgets.QDialogButtonBox(change_item_dialog)
         self.button_box.setGeometry(QtCore.QRect(45, 40, 200, 30))
         self.button_box.setOrientation(QtCore.Qt.Horizontal)
-        self.button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
+        self.button_box.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Cancel |
+                                           QtWidgets.QDialogButtonBox.StandardButton.Ok)
         self.button_box.setObjectName("button_box")
         self.label = QtWidgets.QLabel(change_item_dialog)
         self.label.setGeometry(QtCore.QRect(10, 10, 55, 20))
