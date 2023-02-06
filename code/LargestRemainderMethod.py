@@ -2,7 +2,7 @@ import math
 from ElectionMethod import ElectionMethod
 
 
-class HighestRemainderMethod(ElectionMethod):
+class LargestRemainderMethod(ElectionMethod):
     def __init__(self, _party_dict: dict[str, dict[str, int]], _seats: int, _options: dict[str, bool], _threshold: int,
                  _tag_along_seats: int, _added_value: int, _droop: bool):
         super().__init__(_party_dict, _seats, _options, _threshold, _tag_along_seats)

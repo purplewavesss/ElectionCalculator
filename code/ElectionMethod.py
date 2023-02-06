@@ -40,7 +40,8 @@ class ElectionMethod(ABC):
         if not self.options["overhang"]:
             self.seats -= overhang_party_seats
             for key in overhang_parties.keys():
-                valid_vote_dict.pop(key)
+                if key in valid_vote_dict.keys():
+                    valid_vote_dict.pop(key)
             results = self.calculate_seats(valid_vote_dict)
             for key in overhang_parties.keys():
                 results.update({key: overhang_parties[key]})
@@ -104,7 +105,7 @@ class ElectionMethod(ABC):
         return remainder_dict
 
     @staticmethod
-    def threshold_check(threshold: float, party_votes: int, total_votes: int) -> bool:
-        if party_votes / total_votes >= threshold:
+    def threshold_check(threshold: int, party_votes: int, total_votes: int) -> bool:
+        if party_votes / total_votes >= (threshold / 100):
             return True
         return False

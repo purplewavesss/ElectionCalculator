@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets
 from UiMainWindow import UiMainWindow
 from Columns import Columns
 from gen_message_box import gen_message_box
-from HighestRemainderMethod import HighestRemainderMethod
+from LargestRemainderMethod import LargestRemainderMethod
 
 
 class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
@@ -75,7 +75,7 @@ class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
                 raise ValueError("Incorrect option choice!")
 
     def set_threshold(self):
-        self.threshold = self.threshold_num.value() / 100
+        self.threshold = self.threshold_num.value()
 
     def set_tag_along(self):
         self.tag_along_seats = self.tag_along_num.value()
@@ -90,7 +90,7 @@ class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
 
         # Run elections
         if self.seat_allocation.get_electorates() == electorates:
-            hare = HighestRemainderMethod(election_data, self.seat_allocation.get_total_seats(), self.options,
+            hare = LargestRemainderMethod(election_data, self.seat_allocation.get_total_seats(), self.options,
                                           self.threshold, self.tag_along_seats, 0, False)
             seats_dict = hare.calculate_seats()
             results = hare.calculate_party_dict(seats_dict)
