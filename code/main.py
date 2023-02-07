@@ -2,6 +2,7 @@ import sys
 import qdarkstyle
 from PyQt5 import QtWidgets
 from MainWindow import MainWindow
+from Settings import Settings
 from triggers import implement_triggers
 
 
@@ -10,8 +11,11 @@ def main():
     app = QtWidgets.QApplication(sys.argv)
     window = MainWindow()
 
+    # Initialize settings
+    settings = Settings()
+
     # Implement triggers
-    implement_triggers(window)
+    implement_triggers(window, settings)
 
     # Set stylesheet
     app.setStyleSheet(qdarkstyle.load_stylesheet())
