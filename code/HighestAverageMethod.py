@@ -1,10 +1,11 @@
 from ElectionMethod import ElectionMethod
+from Settings import Settings
 
 
 class HighestAverageMethod(ElectionMethod):
     def __init__(self, _party_dict: dict[str, dict[str, int]], _seats: int, _options: dict[str, bool], _threshold: int,
-                 _tag_along_seats: int, _divisor: float):
-        super().__init__(_party_dict, _seats, _options, _threshold, _tag_along_seats)
+                 _tag_along_seats: int, _divisor: float, _settings: Settings):
+        super().__init__(_party_dict, _seats, _options, _threshold, _tag_along_seats, _settings)
         self.divisor: float = _divisor
 
     def calculate_seats(self, valid_vote_dict: dict[str, int] = None) -> dict[str, int]:

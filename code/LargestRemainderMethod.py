@@ -1,11 +1,12 @@
 import math
 from ElectionMethod import ElectionMethod
+from Settings import Settings
 
 
 class LargestRemainderMethod(ElectionMethod):
     def __init__(self, _party_dict: dict[str, dict[str, int]], _seats: int, _options: dict[str, bool], _threshold: int,
-                 _tag_along_seats: int, _added_value: int, _droop: bool):
-        super().__init__(_party_dict, _seats, _options, _threshold, _tag_along_seats)
+                 _tag_along_seats: int, _added_value: int, _droop: bool, _settings: Settings):
+        super().__init__(_party_dict, _seats, _options, _threshold, _tag_along_seats, _settings)
         self.added_value: int = _added_value
         self.droop: bool = _droop
 
@@ -13,12 +14,13 @@ class LargestRemainderMethod(ElectionMethod):
         seats_dict: dict[str, int] = self.gen_seats_dict(self.party_dict)
         remainder_dict: dict[str, float] = self.gen_remainder_dict(seats_dict)
         allocated_seats: float
+        votes: int
 
         if valid_vote_dict is None:
             valid_vote_dict: dict[str, float] = self.remove_invalid_parties()
 
         if self.droop:
-            quota: float = self.added_value + (sum(valid_vote_dict.values())) / (self.seats + self.added_value)
+            quota: float = self.added_value + sum(valid_vote_dict) / (self.seats + self.added_value)
         else:
             quota: float = (sum(valid_vote_dict.values()) + self.added_value) / self.seats
 

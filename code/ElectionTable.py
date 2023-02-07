@@ -50,7 +50,7 @@ class ElectionTable(QtWidgets.QTableWidget):
                 item = QtWidgets.QTableWidgetItem()
                 self.setItem(y, x, item)
 
-    def append_row(self, table_row: QtWidgets.QTableWidget):
+    def append_row(self, table_row: QtWidgets.QTableWidget) -> bool:
         """Adds a one-row table to an election table"""
         # Remove commas from input
         for x in range(table_row.columnCount()):
@@ -82,10 +82,12 @@ class ElectionTable(QtWidgets.QTableWidget):
             # Add to table_electorates
             self.table_electorates += int(table_row.item(0, Columns.ELECTORATE.value).text())
             self.electorate_increase()
+            return True
 
         else:
             gen_message_box("Invalid input!", "Votes and electorates must be integers.",
                             QtWidgets.QMessageBox.Icon.Warning)
+            return False
 
     def delete_row(self):
         if self.rowCount() > 1:

@@ -6,9 +6,10 @@ from LargestRemainderMethod import LargestRemainderMethod
 
 
 class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
-    def __init__(self):
+    def __init__(self, _settings):
         super(MainWindow, self).__init__()
         self.setup_ui(self)
+        self.settings = _settings
 
         # Process options
         self.options: dict[str, bool] = {"threshold": self.enable_threshold_option.isChecked(),
@@ -91,7 +92,7 @@ class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
         # Run elections
         if self.seat_allocation.get_electorates() == electorates:
             hare = LargestRemainderMethod(election_data, self.seat_allocation.get_total_seats(), self.options,
-                                          self.threshold, self.tag_along_seats, 0, False)
+                                          self.threshold, self.tag_along_seats, 0, False, self.settings)
             seats_dict = hare.calculate_seats()
             results = hare.calculate_party_dict(seats_dict)
 

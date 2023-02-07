@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets
 from UiSettingsDialog import UiSettingsDialog
 from Settings import Settings
+from gen_message_box import gen_message_box
 
 
 class SettingsDialog(UiSettingsDialog, QtWidgets.QDialog):
@@ -17,8 +18,8 @@ class SettingsDialog(UiSettingsDialog, QtWidgets.QDialog):
         self.largest_remainder_box.toggled.connect(self.lrm_trigger)
         self.button_box.accepted.connect(self.change_settings)
         self.button_box.rejected.connect(self.reject)
-        self.vote_number.editingFinished.connect(lambda: self.button_box.button(
-                                                 QtWidgets.QDialogButtonBox.StandardButton.Ok).setEnabled(True))
+        self.vote_number.textEdited.connect(lambda: self.button_box.button(
+                                            QtWidgets.QDialogButtonBox.StandardButton.Ok).setEnabled(True))
 
     def ham_trigger(self):
         self.largest_remainder_box.setChecked(not self.highest_average_box.isChecked())
@@ -36,8 +37,15 @@ class SettingsDialog(UiSettingsDialog, QtWidgets.QDialog):
                     self.settings.current_methods[group_box.objectName()] = radio_button.objectName()
         self.settings.method_type = self.highest_average_box.isChecked()
 
-        if self.vote_number.text != "":
+        if self.vote_number.text().isdecimal() and self.vote_number.text() != "" and self.vote_number.text() != "0":
             self.settings.votes_forced = True
             self.settings.forced_vote_num = int(self.vote_number.text())
+            self.accept()
 
-        self.accept()
+        elif not self.vote_number.text().isdecimal() and self.vote_number.text() != "":
+            gen_message_box("Invalid number of votes!", "Number of votes must be an integer.",
+                            QtWidgets.QMessageBox.Icon.Warning)
+
+        else:
+            self.settings.votes_forced = False
+            self.accept()

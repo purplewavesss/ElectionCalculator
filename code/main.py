@@ -7,12 +7,12 @@ from triggers import implement_triggers
 
 
 def main():
-    # Initialize windows/apps
-    app = QtWidgets.QApplication(sys.argv)
-    window = MainWindow()
-
     # Initialize settings
     settings = Settings()
+
+    # Initialize windows/apps
+    app = QtWidgets.QApplication(sys.argv)
+    window = MainWindow(settings)
 
     # Implement triggers
     implement_triggers(window, settings)

@@ -1,23 +1,26 @@
 from abc import ABC, abstractmethod
+from Settings import Settings
 
 
 class ElectionMethod(ABC):
     def __init__(self, _party_dict: dict[str, dict[str, int]], _seats: int, _options: dict[str, bool],
-                 _threshold: int, _tag_along_seats: int):
+                 _threshold: int, _tag_along_seats: int, _settings: Settings):
         self.party_dict: dict[str, dict[str, int]] = _party_dict
         self.vote_dict: dict[str, int] = self.gen_vote_dict(self.party_dict)
         self.seats: int = _seats
         self.options: dict[str, bool] = _options
         self.threshold = _threshold
         self.tag_along_seats = _tag_along_seats
+        self.settings = _settings
 
     def remove_invalid_parties(self) -> dict[str, int]:
         """Checks if parties fail the threshold, and removes them if they do"""
         valid_dict: dict[str, int] = {}
+        votes: int = self.calculate_votes(self.vote_dict, self.settings)
 
         if self.options["threshold"]:
             for key in self.vote_dict:
-                if self.threshold_check(self.threshold, self.vote_dict[key], sum(self.vote_dict.values())) or \
+                if self.threshold_check(self.threshold, self.vote_dict[key], votes) or \
                         (self.party_dict[key]["electorates"] >= self.tag_along_seats and self.options["tag_along"]):
                     valid_dict.update({key: self.vote_dict[key]})
             return valid_dict
@@ -70,12 +73,25 @@ class ElectionMethod(ABC):
 
         # Calculate difference between number of seats and number of votes
         for party in seats_dict.keys():
-            seats_percentage: float = seats_dict[party] / sum(seats_dict.values())
+            seats_percentage: float = seats_dict[party] / seats
             votes_percentage: float = vote_dict[party] / sum(vote_dict.values())
             diff = max(diff, (seats_percentage / votes_percentage))
 
         seats = int(seats * diff)
         return seats
+
+    @staticmethod
+    def calculate_votes(valid_vote_dict: dict[str, int], settings: Settings) -> int:
+        if settings.votes_forced:
+            votes = settings.forced_vote_num
+            if votes < sum(valid_vote_dict.values()):
+                # TODO: Add a dialog asking for the user to change their number of votes to something equal to or above
+                # the current number of votes
+                raise NotImplementedError
+            else:
+                return votes
+        else:
+            return sum(valid_vote_dict.values())
 
     @staticmethod
     def gen_vote_dict(party_dict: dict[str, dict[str, int]]) -> dict[str, int]:
