@@ -20,7 +20,7 @@ class LargestRemainderMethod(ElectionMethod):
             valid_vote_dict: dict[str, float] = self.remove_invalid_parties()
 
         if self.droop:
-            quota: float = self.added_value + sum(valid_vote_dict) / (self.seats + self.added_value)
+            quota: float = self.added_value + sum(valid_vote_dict.values()) / (self.seats + self.added_value)
         else:
             quota: float = (sum(valid_vote_dict.values()) + self.added_value) / self.seats
 

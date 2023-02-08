@@ -20,6 +20,15 @@ class SettingsDialog(UiSettingsDialog, QtWidgets.QDialog):
         self.button_box.rejected.connect(self.reject)
         self.vote_number.textEdited.connect(lambda: self.button_box.button(
                                             QtWidgets.QDialogButtonBox.StandardButton.Ok).setEnabled(True))
+        self.highest_average_box.setChecked(self.settings.method_type)
+        self.largest_remainder_box.setChecked(not self.settings.method_type)
+        for group_box in [self.highest_average_box, self.largest_remainder_box]:
+            for radio_button in group_box.children():
+                radio_button: QtWidgets.QRadioButton
+                radio_button.toggled.connect(lambda: self.button_box.button(
+                                             QtWidgets.QDialogButtonBox.StandardButton.Ok).setEnabled(True))
+                radio_button.setChecked(radio_button.objectName() ==
+                                        self.settings.current_methods[group_box.objectName()])
 
     def ham_trigger(self):
         self.largest_remainder_box.setChecked(not self.highest_average_box.isChecked())
@@ -30,7 +39,7 @@ class SettingsDialog(UiSettingsDialog, QtWidgets.QDialog):
         self.button_box.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setEnabled(True)
 
     def change_settings(self):
-        for group_box in [self.election_method_box, self.highest_average_box]:
+        for group_box in [self.highest_average_box, self.largest_remainder_box]:
             for radio_button in group_box.children():
                 radio_button: QtWidgets.QRadioButton
                 if radio_button.isChecked():

@@ -198,3 +198,5 @@ class UiMainWindow(object):
     def plus_action(self):
         if not self.calculate_button.isEnabled():
             self.calculate_button.setEnabled(self.election_table.append_row(self.append_party_table))
+        else:
+            self.election_table.append_row(self.append_party_table)

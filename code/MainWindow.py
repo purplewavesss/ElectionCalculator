@@ -1,8 +1,8 @@
 from PyQt5 import QtWidgets
 from UiMainWindow import UiMainWindow
 from Columns import Columns
+from ElectionMethodFactory import ElectionMethodFactory
 from gen_message_box import gen_message_box
-from LargestRemainderMethod import LargestRemainderMethod
 
 
 class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
@@ -84,17 +84,19 @@ class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
     def calculate(self):
         """Calculates and displays election results"""
         election_data: dict[str, dict[str, int]] = self.election_table.generate_party_dict()
-        electorates = 0
+        electorates: int = 0
+        election_method_factory = ElectionMethodFactory(election_data, self.seat_allocation.get_total_seats(),
+                                                        self.options, self.threshold, self.tag_along_seats,
+                                                        self.settings)
 
         for party in election_data.values():
             electorates += party["electorates"]
 
         # Run elections
         if self.seat_allocation.get_electorates() == electorates:
-            hare = LargestRemainderMethod(election_data, self.seat_allocation.get_total_seats(), self.options,
-                                          self.threshold, self.tag_along_seats, 0, False, self.settings)
-            seats_dict = hare.calculate_seats()
-            results = hare.calculate_party_dict(seats_dict)
+            method = election_method_factory.create_election_method()
+            seats_dict = method.calculate_seats()
+            results = method.calculate_party_dict(seats_dict)
 
             # Show results in table
             for x in range(self.election_table.rowCount()):
