@@ -102,7 +102,7 @@ class ElectionTable(QtWidgets.QTableWidget):
         """Generates a dictionary determining whether items are editable"""
         for x in range(self.rowCount()):
             for y in range(self.columnCount()):
-                if y <= Columns.ELECTORATE.value:
+                if y <= Columns.ELECTORATE.value and x != 0:
                     self.edit_dict.update({(x, y): True})
                 else:
                     self.edit_dict.update({(x, y): False})
@@ -129,12 +129,13 @@ class ElectionTable(QtWidgets.QTableWidget):
         self.setItem(rows, columns, item)
 
     def item_clicked(self, item: QtWidgets.QTableWidgetItem):
-        if (item.column(), item.row()) in self.edit_dict:
-            if item.column() > Columns.PARTY.value:
-                change_item_dialog = ChangeItemDialog(item, True)
-            else:
-                change_item_dialog = ChangeItemDialog(item, False)
-            change_item_dialog.exec()
+        if (item.row(), item.column()) in self.edit_dict:
+            if self.edit_dict[(item.row(), item.column())]:
+                if item.column() == Columns.PARTY.value:
+                    change_item_dialog = ChangeItemDialog(item, False)
+                else:
+                    change_item_dialog = ChangeItemDialog(item, True)
+                change_item_dialog.exec()
 
     def electorate_increase(self):
         try:
