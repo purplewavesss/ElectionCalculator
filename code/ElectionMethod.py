@@ -26,7 +26,7 @@ class ElectionMethod(ABC):
             return valid_dict
         return self.vote_dict.copy()
 
-    def calculate_party_dict(self, results: dict[str, int]) -> dict[str, dict[str, int]]:
+    def calculate_election(self, results: dict[str, int]) -> dict[str, dict[str, int]]:
         """Calculates and returns the number of electorates, list seats, and total seats for each party"""
         overhang_party_seats = 0
         overhang_parties: dict[str, int] = {}

@@ -95,7 +95,7 @@ class ElectionTable(QtWidgets.QTableWidget):
             self.table_electorates -= int(self.item(deleted_row, Columns.ELECTORATE.value).text())
             self.removeRow(deleted_row)
             for x in range(self.columnCount()):
-                if x <= Columns.ELECTORATE.value:
+                if (deleted_row, x) in self.edit_dict.keys():
                     self.edit_dict.pop((deleted_row, x))
 
     def generate_edit_dict(self):
@@ -145,3 +145,21 @@ class ElectionTable(QtWidgets.QTableWidget):
         except ValueError:
             self.seat_allocation.set_electorates(self.table_electorates)
             self.seat_allocation.seat_value_changed()
+
+    def display_election(self, results: dict[str, dict[str, int]]):
+        parties: list[str] = list(results.keys())
+
+        for x in range(self.rowCount()):
+            if x != 0:
+                self.set_value(x, Columns.PARTY.value, parties[x - 1])
+                self.set_value(x, Columns.VOTES.value, str(results[parties[x - 1]]["votes"]))
+                self.set_value(x, Columns.ELECTORATE.value, str(results[parties[x - 1]]["electorates"]))
+                self.set_value(x, Columns.LIST.value, str(results[parties[x - 1]]["list"]))
+                self.set_value(x, Columns.TOTAL.value, str(results[parties[x - 1]]["total"]))
+
+    def add_header(self):
+        self.set_value(0, Columns.PARTY.value, "Party Name:")
+        self.set_value(0, Columns.VOTES.value, "# of votes:")
+        self.set_value(0, Columns.ELECTORATE.value, "# of electorates:")
+        self.set_value(0, Columns.LIST.value, "# of list seats:")
+        self.set_value(0, Columns.TOTAL.value, "# of total seats:")

@@ -1,0 +1,75 @@
+{
+  "parties": {
+    "SDP": {
+      "votes": 11955434,
+      "electorates": 121,
+      "list": 85,
+      "total": 206
+    },
+
+    "CDU": {
+      "votes": 8775471,
+      "electorates": 98,
+      "list": 54,
+      "total": 152
+    },
+
+    "GRUNE": {
+      "votes": 6852206,
+      "electorates": 16,
+      "list": 102,
+      "total": 118
+    },
+
+    "FDP": {
+      "votes": 5319952,
+      "electorates": 0,
+      "list": 92,
+      "total": 92
+    },
+
+    "AfD": {
+      "votes": 4803902,
+      "electorates": 16,
+      "list": 67,
+      "total": 83
+    },
+
+    "CSU": {
+      "votes": 2402827,
+      "electorates": 45,
+      "list": 0,
+      "total": 45
+    },
+
+    "LINKE": {
+      "votes": 2270906,
+      "electorates": 3,
+      "list": 36,
+      "total": 39
+    },
+
+    "SSW": {
+      "votes": 55578,
+      "electorates": 1,
+      "list": 0,
+      "total": 1
+    }
+  },
+
+  "allocation": {
+    "electorates": 300,
+    "list": 436,
+    "total": 736
+  },
+
+  "settings": {
+    "method_type": true,
+    "current_methods": {
+      "highest_average": "sainte_lague",
+      "largest_remainder": "hare"
+    },
+    "votes_forced": true,
+    "forced_vote_num": 46854508
+  }
+}

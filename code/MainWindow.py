@@ -95,16 +95,9 @@ class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
         # Run elections
         if self.seat_allocation.get_electorates() == electorates:
             method = election_method_factory.create_election_method()
-            seats_dict = method.calculate_seats()
-            results = method.calculate_party_dict(seats_dict)
+            results = method.calculate_election(method.calculate_seats())
 
-            # Show results in table
-            for x in range(self.election_table.rowCount()):
-                if x != 0:
-                    self.election_table.set_value(x, Columns.LIST.value,
-                                                  str(results[self.election_table.item(x, 0).text()]["list"]))
-                    self.election_table.set_value(x, Columns.TOTAL.value,
-                                                  str(results[self.election_table.item(x, 0).text()]["total"]))
+            self.election_table.display_election(results)
 
         else:
             gen_message_box("Invalid electorate number!", "The number of electorates for the election does not match "
