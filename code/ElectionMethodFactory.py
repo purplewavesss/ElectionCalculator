@@ -19,16 +19,17 @@ class ElectionMethodFactory:
             match self.settings.current_methods["highest_average"]:
                 case "d_hondt":
                     return HighestAverageMethod(self.party_dict, self.seats, self.options, self.threshold,
-                                                self.tag_along_seats, 1, self.settings)
+                                                self.tag_along_seats, self.settings, 1, False)
                 case "sainte_lague":
                     return HighestAverageMethod(self.party_dict, self.seats, self.options, self.threshold,
-                                                self.tag_along_seats, 0.5, self.settings)
+                                                self.tag_along_seats, self.settings, 0.5, False)
                 case "huntington_hill":
-                    raise NotImplementedError
+                    return HighestAverageMethod(self.party_dict, self.seats, self.options, self.threshold,
+                                                self.tag_along_seats, self.settings, 0.5, True)
 
                 case "imperiali_ham":
                     return HighestAverageMethod(self.party_dict, self.seats, self.options, self.threshold,
-                                                self.tag_along_seats, 2, self.settings)
+                                                self.tag_along_seats, self.settings, 2, False)
         else:
             match self.settings.current_methods["largest_remainder"]:
                 case "hare":
