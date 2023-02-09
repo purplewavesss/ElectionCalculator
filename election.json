@@ -71,5 +71,20 @@
     },
     "votes_forced": true,
     "forced_vote_num": 46854508
+  },
+
+  "options": {
+    "names": {
+      "threshold": true,
+      "tag_along": true,
+      "overhang": false,
+      "levelling": true
+    },
+
+    "values":
+    {
+      "threshold_num": 5,
+      "tag_along_num": 3
+    }
   }
 }

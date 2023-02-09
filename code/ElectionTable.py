@@ -24,7 +24,7 @@ class ElectionTable(QtWidgets.QTableWidget):
         # Set edit triggers
         if not can_edit:
             self.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-            self.itemClicked.connect(self.item_clicked)
+            self.itemClicked.connect(self.item_clicked)  # type: ignore
 
         # Set font
         font = QtGui.QFont()
@@ -62,16 +62,18 @@ class ElectionTable(QtWidgets.QTableWidget):
             table_row.item(0, Columns.ELECTORATE.value).setText("0")
 
         # Check if input is valid for row added
+        # TODO: Account for more possibilities
         if str(table_row.item(0, Columns.VOTES.value).text()).isdecimal() and \
                 str(table_row.item(0, Columns.ELECTORATE.value).text()).isdecimal():
             row_position = self.rowCount()
 
             # Insert and fill row
             self.insertRow(row_position)
-            for x in range(table_row.columnCount()):
+            for x in range(self.columnCount()):
                 item = QtWidgets.QTableWidgetItem()
                 self.setItem(row_position, x, item)
-                self.item(row_position, x).setText(table_row.item(0, x).text())
+                if x < table_row.columnCount():
+                    self.item(row_position, x).setText(table_row.item(0, x).text())
 
                 # Check if items are editable
                 if x <= Columns.ELECTORATE.value:
@@ -117,10 +119,18 @@ class ElectionTable(QtWidgets.QTableWidget):
         party_dict: dict[str, dict[str, int]] = {}
         for x in range(self.rowCount()):
             if x != 0:
-                # Creates a dict of {party_name: {votes, electorates}}
-                party_dict.update({self.item(x, Columns.PARTY.value).text(): {"votes":
-                                  int(self.item(x, Columns.VOTES.value).text()), "electorates":
-                                  int(self.item(x, Columns.ELECTORATE.value).text())}})
+                # Creates a dict of {party_name: {votes, electorates, list, total}}
+                party_dict.update({self.item(x, Columns.PARTY.value).text():
+                                  {"votes": int(self.item(x, Columns.VOTES.value).text()),
+                                   "electorates": int(self.item(x, Columns.ELECTORATE.value).text())}})
+
+                if self.item(x, Columns.LIST.value).text():
+                    party_dict[self.item(x, Columns.PARTY.value).text()].update({
+                        "list": int(self.item(x, Columns.LIST.value).text())})
+
+                if self.item(x, Columns.TOTAL.value).text():
+                    party_dict[self.item(x, Columns.PARTY.value).text()].update({
+                        "TOTAL": int(self.item(x, Columns.TOTAL.value).text())})
         return party_dict
 
     def set_value(self, rows: int, columns: int, text: str):

@@ -82,3 +82,6 @@ class SeatAllocation:
                             QtWidgets.QMessageBox.Icon.Warning)
 
         return button_enabled
+
+    def create_dict(self) -> dict:
+        return {"electorates": self.get_electorates(), "list": self.get_list_seats(), "total": self.get_total_seats()}

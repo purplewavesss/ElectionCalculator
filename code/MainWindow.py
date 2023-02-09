@@ -1,11 +1,11 @@
 from PyQt5 import QtWidgets
 from UiMainWindow import UiMainWindow
-from Columns import Columns
 from ElectionMethodFactory import ElectionMethodFactory
 from gen_message_box import gen_message_box
 
 
 class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
+    # TODO: Prompt user to save if they exit
     def __init__(self, _settings):
         super(MainWindow, self).__init__()
         self.setup_ui(self)
@@ -103,3 +103,21 @@ class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
             gen_message_box("Invalid electorate number!", "The number of electorates for the election does not match "
                                                           "the number of electorates earned by parties.",
                                                           QtWidgets.QMessageBox.Icon.Warning)
+
+    def set_options(self, options: dict[str, dict]):
+        self.options = options["names"]
+        self.threshold_num.setValue(options["values"]["threshold_num"])
+        self.set_threshold()
+        self.tag_along_num(options["values"]["tag_along_num"])
+        self.set_tag_along()
+
+        # Set group box items
+        for group_box in (self.levelling_box, self.overhang_box, self.tag_along_box, self.threshold_box):
+            for radio_button in group_box.children():
+                if radio_button is QtWidgets.QRadioButton:
+                    radio_button: QtWidgets.QRadioButton
+                    status: str = radio_button.objectName().split("_")[0]
+                    if status == "enable":
+                        radio_button.setChecked(self.options["names"][radio_button.objectName().split("_")[1]])
+                    else:
+                        radio_button.setChecked(not self.options["names"][radio_button.objectName().split("_")[1]])
