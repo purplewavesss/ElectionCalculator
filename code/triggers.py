@@ -1,12 +1,9 @@
 import os
 import sys
-import json_functions
 from PyQt5 import QtWidgets
 from MainWindow import MainWindow
 from SettingsDialog import SettingsDialog
 from Settings import Settings
-from ElectionTable import ElectionTable
-from SeatAllocation import SeatAllocation
 from gen_message_box import gen_message_box
 
 
@@ -23,13 +20,15 @@ def open_action_triggers(main_window: MainWindow):
     file_name: str = file_dialog.getOpenFileName(file_dialog, "Open Election JSON", os.path.expanduser('~') +
                                                  "/Documents", "JSON files (*.json)")[0]
     if file_name != "":
-        json_functions.read_json(file_name, main_window)
+        main_window.read_json(file_name)
 
 
-def save_action_triggers(main_window):
+def save_action_triggers(main_window: MainWindow):
     file_dialog = QtWidgets.QFileDialog()
     file_name: str = file_dialog.getSaveFileName(file_dialog, "Save Election JSON", os.path.expanduser('~') +
                                                  "/Documents/election.json", "JSON files (*.json)")[0]
+    if file_name != "":
+        main_window.save_json(file_name)
 
 
 def exit_action_triggers():

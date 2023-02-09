@@ -130,7 +130,7 @@ class ElectionTable(QtWidgets.QTableWidget):
 
                 if self.item(x, Columns.TOTAL.value).text():
                     party_dict[self.item(x, Columns.PARTY.value).text()].update({
-                        "TOTAL": int(self.item(x, Columns.TOTAL.value).text())})
+                        "total": int(self.item(x, Columns.TOTAL.value).text())})
         return party_dict
 
     def set_value(self, rows: int, columns: int, text: str):

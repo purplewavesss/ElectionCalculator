@@ -40,6 +40,7 @@ class ElectionMethod(ABC):
                 overhang_parties.update({party: results[party]})
 
         # Removes list seats to account for overhang seats if needed
+        # TODO: Fix levelling for parties that receive electorates seats without crossing the threshold
         if not self.options["overhang"]:
             self.seats -= overhang_party_seats
             for key in overhang_parties.keys():
