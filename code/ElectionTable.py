@@ -49,6 +49,10 @@ class ElectionTable(QtWidgets.QTableWidget):
             for y in range(self.rowCount()):
                 item = QtWidgets.QTableWidgetItem()
                 self.setItem(y, x, item)
+                if x <= Columns.ELECTORATE.value and y > 0:
+                    self.edit_dict.update({(x, y): True})
+                else:
+                    self.edit_dict.update({(x, y): False})
 
     def append_row(self, table_row: QtWidgets.QTableWidget) -> bool:
         """Adds a one-row table to an election table"""
@@ -157,6 +161,7 @@ class ElectionTable(QtWidgets.QTableWidget):
             self.seat_allocation.seat_value_changed()
 
     def display_election(self, results: dict[str, dict[str, int]]):
+        # TODO: Make election results editable
         parties: list[str] = list(results.keys())
 
         for x in range(self.rowCount()):

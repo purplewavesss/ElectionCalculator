@@ -191,12 +191,5 @@ class UiMainWindow(object):
         self.exit_action.setText(_translate("main_window", "Exit"))
 
     def set_actions(self):
-        self.plus_button.clicked.connect(self.plus_action)
         self.minus_button.clicked.connect(self.election_table.delete_row)
         self.clear_button.clicked.connect(self.election_table.clear_table)
-
-    def plus_action(self):
-        if not self.calculate_button.isEnabled():
-            self.calculate_button.setEnabled(self.election_table.append_row(self.append_party_table))
-        else:
-            self.election_table.append_row(self.append_party_table)

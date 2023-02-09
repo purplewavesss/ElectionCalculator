@@ -24,11 +24,7 @@ def open_action_triggers(main_window: MainWindow):
 
 
 def save_action_triggers(main_window: MainWindow):
-    file_dialog = QtWidgets.QFileDialog()
-    file_name: str = file_dialog.getSaveFileName(file_dialog, "Save Election JSON", os.path.expanduser('~') +
-                                                 "/Documents/election.json", "JSON files (*.json)")[0]
-    if file_name != "":
-        main_window.save_json(file_name)
+    main_window.has_saved = main_window.save_json()
 
 
 def exit_action_triggers():

@@ -1,18 +1,17 @@
 import json
 import os
-
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtGui
 from UiMainWindow import UiMainWindow
 from ElectionMethodFactory import ElectionMethodFactory
 from gen_message_box import gen_message_box
 
 
 class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
-    # TODO: Prompt user to save if they exit
     def __init__(self, _settings):
         super(MainWindow, self).__init__()
         self.setup_ui(self)
         self.settings = _settings
+        self.has_saved: bool = True
 
         # Process options
         self.options: dict[str, bool] = {"threshold": self.enable_threshold_option.isChecked(),
@@ -46,13 +45,13 @@ class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
         self.calculate_button.clicked.connect(self.calculate)
 
         # Connect line edits to triggers
-        self.electorate_input.editingFinished.connect(lambda: self.calculate_button.setEnabled(
+        self.electorate_input.editingFinished.connect(lambda: self.seat_change(
             self.seat_allocation.seat_value_changed()))
-        self.list_input.editingFinished.connect(lambda: self.calculate_button.setEnabled(
-            self.seat_allocation.seat_value_changed()))
-        self.total_input.editingFinished.connect(lambda: self.calculate_button.setEnabled(
-            self.seat_allocation.total_seats_changed()))
+        self.list_input.editingFinished.connect(lambda: self.seat_change(self.seat_allocation.seat_value_changed()))
+        self.total_input.editingFinished.connect(lambda: self.seat_change(self.seat_allocation.seat_value_changed()))
 
+        # Connect to buttons
+        self.plus_button.clicked.connect(self.plus_action)
         self.calculate_button.setDisabled(True)
 
     def change_options(self, option: str, toggled_on: bool):
@@ -138,7 +137,6 @@ class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
 
     def read_json(self, file_path: str):
         election: dict[str, dict]
-        parties: int
 
         with open(file_path, "r") as json_file:
             election = json.loads(json_file.read())
@@ -147,6 +145,7 @@ class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
             # Import election results
             self.election_table.clear_table()
             self.election_table.setRowCount(len(election["parties"].keys()) + 1)
+            self.election_table.initialize_rows()
             self.election_table.add_header()
             self.election_table.display_election(election["parties"])
 
@@ -167,19 +166,70 @@ class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
         except KeyError:
             gen_message_box("Invalid JSON File!", "The JSON file imported does not contain a valid election. Use "
                                                   "election.json as a blueprint to create a valid one.",
-                            QtWidgets.QMessageBox.Icon.Critical)
+                                                  QtWidgets.QMessageBox.Icon.Critical)
 
-    def save_json(self, file_path: str):
-        file_action: str
+    def save_json(self) -> bool:
+        file_dialog = QtWidgets.QFileDialog()
+        file_path: str = file_dialog.getSaveFileName(file_dialog, "Save Election JSON", os.path.expanduser('~') +
+                                                     "/Documents/election.json", "JSON files (*.json)")[0]
+        if file_path != "":
+            file_action: str
 
-        if os.path.isfile(file_path):
-            file_action = "w"
+            if os.path.isfile(file_path):
+                file_action = "w"
+
+            else:
+                file_action = "x"
+
+            with open(file_path, file_action) as json_file:
+                json_file.write(json.dumps({"parties": self.election_table.generate_party_dict(),
+                                            "settings": self.settings.create_dict(),
+                                            "allocation": self.seat_allocation.create_dict(),
+                                            "options": self.get_options_dict()}, indent=4))
+            return True
 
         else:
-            file_action = "x"
+            return False
 
-        with open(file_path, file_action) as json_file:
-            json_file.write(json.dumps({"parties": self.election_table.generate_party_dict(),
-                                        "settings": self.settings.create_dict(),
-                                        "allocation": self.seat_allocation.create_dict(),
-                                        "options": self.get_options_dict()}, indent=4))
+    def plus_action(self):
+        added: bool = self.election_table.append_row(self.append_party_table)
+
+        if not self.calculate_button.isEnabled():
+            self.calculate_button.setEnabled(added)
+        if self.has_saved:
+            self.has_saved = not added
+
+    def seat_change(self, seat_changed: callable):
+        self.has_saved = False
+        self.calculate_button.setEnabled(seat_changed)
+
+    def closeEvent(self, event: QtGui.QCloseEvent) -> None:
+        if not self.has_saved:
+            save_message_box = gen_message_box("Save", "Do you want to save this election before quitting?",
+                                               QtWidgets.QMessageBox.Icon.Question, True)
+
+            # Create buttons
+            yes_button = QtWidgets.QPushButton()
+            yes_button.setText("Yes")
+            no_button = QtWidgets.QPushButton()
+            no_button.setText("No")
+            cancel_button = QtWidgets.QPushButton()
+            cancel_button.setText("Cancel")
+
+            # Add triggers
+            yes_button.clicked.connect(lambda: self.yes_button_triggers(event))
+            no_button.clicked.connect(event.accept)
+            cancel_button.clicked.connect(event.ignore)
+
+            # Add buttons
+            save_message_box.addButton(yes_button, QtWidgets.QMessageBox.ButtonRole.YesRole)
+            save_message_box.addButton(no_button, QtWidgets.QMessageBox.ButtonRole.NoRole)
+            save_message_box.addButton(cancel_button, QtWidgets.QMessageBox.ButtonRole.RejectRole)
+
+            save_message_box.exec()
+
+    def yes_button_triggers(self, event: QtGui.QCloseEvent):
+        if self.save_json():
+            event.accept()
+        else:
+            event.ignore()
