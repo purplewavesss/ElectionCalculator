@@ -59,7 +59,7 @@ class ElectionTable(QtWidgets.QTableWidget):
         # Remove commas from input and zero out empty values
         for x in range(table_row.columnCount()):
             if table_row.item(0, x) == "":
-                table_row.item(0, x).setText(0)
+                table_row.item(0, x).setText("0")
 
             table_row.item(0, x).setText(re.sub(",", "", table_row.item(0, x).text()))
 
@@ -158,7 +158,6 @@ class ElectionTable(QtWidgets.QTableWidget):
             self.seat_allocation.seat_value_changed()
 
     def display_election(self, results: dict[str, dict[str, int]]):
-        # TODO: Make election results editable
         parties: list[str] = list(results.keys())
 
         for x in range(self.rowCount()):
@@ -168,6 +167,10 @@ class ElectionTable(QtWidgets.QTableWidget):
                 self.set_value(x, Columns.ELECTORATE.value, str(results[parties[x - 1]]["electorates"]))
                 self.set_value(x, Columns.LIST.value, str(results[parties[x - 1]]["list"]))
                 self.set_value(x, Columns.TOTAL.value, str(results[parties[x - 1]]["total"]))
+
+                if self.item(x, Columns.PARTY.value) != "":
+                    self.edit_dict.update({(x, Columns.ELECTORATE.value): True})
+                    self.edit_dict.update({(x, Columns.LIST.value): True})
 
     def add_header(self):
         self.set_value(0, Columns.PARTY.value, "Party Name:")
