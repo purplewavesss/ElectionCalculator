@@ -56,17 +56,14 @@ class ElectionTable(QtWidgets.QTableWidget):
 
     def append_row(self, table_row: QtWidgets.QTableWidget) -> bool:
         """Adds a one-row table to an election table"""
-        # Remove commas from input
+        # Remove commas from input and zero out empty values
         for x in range(table_row.columnCount()):
+            if table_row.item(0, x) == "":
+                table_row.item(0, x).setText(0)
+
             table_row.item(0, x).setText(re.sub(",", "", table_row.item(0, x).text()))
 
-        # Zero out empty values
-        if (table_row.item(0, Columns.ELECTORATE.value).text() or table_row.item(0, Columns.TOTAL.value).text()) \
-                == "":
-            table_row.item(0, Columns.ELECTORATE.value).setText("0")
-
         # Check if input is valid for row added
-        # TODO: Account for more possibilities
         if str(table_row.item(0, Columns.VOTES.value).text()).isdecimal() and \
                 str(table_row.item(0, Columns.ELECTORATE.value).text()).isdecimal():
             row_position = self.rowCount()
