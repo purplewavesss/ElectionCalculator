@@ -12,6 +12,7 @@ class ElectionTable(QtWidgets.QTableWidget):
         super(ElectionTable, self).__init__(parent)
         self.setGeometry(geometry)
         self.edit_dict: dict[tuple[int, int], bool] = {}
+        self.parties: list[str] = []
         self.seat_allocation: SeatAllocation = _seat_allocation
         self.table_electorates: int = 0
 
@@ -64,33 +65,40 @@ class ElectionTable(QtWidgets.QTableWidget):
             table_row.item(0, x).setText(re.sub(",", "", table_row.item(0, x).text()))
 
         # Check if input is valid for row added
-        if str(table_row.item(0, Columns.VOTES.value).text()).isdecimal() and \
-                str(table_row.item(0, Columns.ELECTORATE.value).text()).isdecimal():
-            row_position = self.rowCount()
-
-            # Insert and fill row
-            self.insertRow(row_position)
-            for x in range(self.columnCount()):
-                item = QtWidgets.QTableWidgetItem()
-                self.setItem(row_position, x, item)
-                if x < table_row.columnCount():
-                    self.item(row_position, x).setText(table_row.item(0, x).text())
-
-                # Check if items are editable
-                if x <= Columns.ELECTORATE.value:
-                    self.edit_dict.update({(row_position, x): True})
-                else:
-                    self.edit_dict.update({(row_position, x): False})
-
-            # Add to table_electorates
-            self.table_electorates += int(table_row.item(0, Columns.ELECTORATE.value).text())
-            self.electorate_increase()
-            return True
-
-        else:
+        if not table_row.item(0, Columns.VOTES.value).text().isdecimal() or not \
+                table_row.item(0, Columns.ELECTORATE.value).text().isdecimal():
             gen_message_box("Invalid input!", "Votes and electorates must be integers.",
                             QtWidgets.QMessageBox.Icon.Warning)
             return False
+
+        # Check if party already exists
+        if table_row.item(0, Columns.PARTY.value).text() in self.parties:
+            gen_message_box("Party already exists!", "You cannot have two parties with the same name.",
+                            QtWidgets.QMessageBox.Icon.Warning)
+            return False
+        else:
+            self.parties.append(table_row.item(0, Columns.PARTY.value).text())
+
+        row_position = self.rowCount()
+
+        # Insert and fill row
+        self.insertRow(row_position)
+        for x in range(self.columnCount()):
+            item = QtWidgets.QTableWidgetItem()
+            self.setItem(row_position, x, item)
+            if x < table_row.columnCount():
+                self.item(row_position, x).setText(table_row.item(0, x).text())
+
+            # Check if items are editable
+            if x <= Columns.ELECTORATE.value:
+                self.edit_dict.update({(row_position, x): True})
+            else:
+                self.edit_dict.update({(row_position, x): False})
+
+        # Add to table_electorates
+        self.table_electorates += int(table_row.item(0, Columns.ELECTORATE.value).text())
+        self.electorate_increase()
+        return True
 
     def delete_row(self):
         if self.rowCount() > 1:
@@ -100,6 +108,7 @@ class ElectionTable(QtWidgets.QTableWidget):
             for x in range(self.columnCount()):
                 if (deleted_row, x) in self.edit_dict.keys():
                     self.edit_dict.pop((deleted_row, x))
+        self.parties.pop()
 
     def generate_edit_dict(self):
         """Generates a dictionary determining whether items are editable"""

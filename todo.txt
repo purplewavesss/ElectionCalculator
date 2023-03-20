@@ -1,6 +1,7 @@
 + Add "New" option
-- Remove duplicates
++ Remove duplicates
 - Automatically calculate results?
 - Show total votes
 - Better error handling
 - Table error handling
+- Finally fix levelling (will probably require a partial rewrite)
