@@ -33,6 +33,11 @@ class SeatAllocation:
         self.__total_seats = _total_seats
         self.total_input.setText(str(self.get_total_seats()))
 
+    def reset_seats(self):
+        self.set_electorates(0)
+        self.set_list_seats(0)
+        self.set_total_seats(0)
+
     def seat_value_changed(self) -> bool:
         """Changes total_input to value of both inputs, and returns whether calculation is possible"""
         button_enabled = False

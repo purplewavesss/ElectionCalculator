@@ -1,0 +1,6 @@
++ Add "New" option
+- Remove duplicates
+- Automatically calculate results?
+- Show total votes
+- Better error handling
+- Table error handling

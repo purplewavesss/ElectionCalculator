@@ -115,6 +115,8 @@ class ElectionTable(QtWidgets.QTableWidget):
         for x in range(self.rowCount() - 1):
             self.delete_row()
 
+        self.seat_allocation.reset_seats()
+
     def generate_party_dict(self) -> dict[str, dict[str, int]]:
         """Generates dictionary containing party info"""
         party_dict: dict[str, dict[str, int]] = {}

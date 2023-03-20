@@ -8,11 +8,17 @@ from gen_message_box import gen_message_box
 
 
 def implement_triggers(window: MainWindow, settings: Settings):
+    window.new_action.triggered.connect(lambda: new_action_triggers(window))
     window.open_action.triggered.connect(lambda: open_action_triggers(window))
     window.save_action.triggered.connect(lambda: save_action_triggers(window))
     window.exit_action.triggered.connect(exit_action_triggers)
     window.about_action.triggered.connect(about_action_triggers)
     window.settings_action.triggered.connect(lambda: settings_triggers(settings))
+
+
+def new_action_triggers(main_window: MainWindow):
+    main_window.election_table.clear_table()
+    main_window.has_saved = True
 
 
 def open_action_triggers(main_window: MainWindow):

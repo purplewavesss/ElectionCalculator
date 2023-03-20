@@ -104,6 +104,8 @@ class UiMainWindow(object):
         self.help_menu = QtWidgets.QMenu(self.menu_bar)
         self.help_menu.setObjectName("help_menu")
         main_window.setMenuBar(self.menu_bar)
+        self.new_action = QtWidgets.QAction(main_window)
+        self.new_action.setObjectName("new_action")
         self.open_action = QtWidgets.QAction(main_window)
         self.open_action.setObjectName("open_action")
         self.about_action = QtWidgets.QAction(main_window)
@@ -114,6 +116,7 @@ class UiMainWindow(object):
         self.exit_action.setObjectName("exit_action")
         self.settings_action = QtWidgets.QAction(main_window)
         self.settings_action.setObjectName("settings_action")
+        self.file_menu.addAction(self.new_action)
         self.file_menu.addAction(self.open_action)
         self.file_menu.addAction(self.save_action)
         self.file_menu.addAction(self.settings_action)
@@ -124,7 +127,6 @@ class UiMainWindow(object):
 
         self.retranslate_ui(main_window)
         QtCore.QMetaObject.connectSlotsByName(main_window)
-        self.set_actions()
 
     def retranslate_ui(self, main_window):
         _translate = QtCore.QCoreApplication.translate
@@ -185,11 +187,8 @@ class UiMainWindow(object):
         self.file_menu.setTitle(_translate("main_window", "File"))
         self.help_menu.setTitle(_translate("main_window", "Help"))
         self.settings_action.setText(_translate("main_window", "Settings"))
+        self.new_action.setText(_translate("main_window", "New"))
         self.open_action.setText(_translate("main_window", "Open"))
         self.about_action.setText(_translate("main_window", "About"))
         self.save_action.setText(_translate("main_window", "Save"))
         self.exit_action.setText(_translate("main_window", "Exit"))
-
-    def set_actions(self):
-        self.minus_button.clicked.connect(self.election_table.delete_row)
-        self.clear_button.clicked.connect(self.election_table.clear_table)

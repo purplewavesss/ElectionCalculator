@@ -53,6 +53,8 @@ class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
         # Connect to buttons
         self.plus_button.clicked.connect(self.plus_action)
         self.calculate_button.setDisabled(True)
+        self.minus_button.clicked.connect(self.election_table.delete_row)
+        self.clear_button.clicked.connect(self.election_table.clear_table)
 
     def change_options(self, option: str, toggled_on: bool):
         """Switches option based on user input"""
