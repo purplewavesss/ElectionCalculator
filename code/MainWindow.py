@@ -87,6 +87,11 @@ class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
 
     def calculate(self):
         """Calculates and displays election results"""
+        if self.election_table.rowCount() == 1:
+            gen_message_box("No parties!", "You cannot calculate an election with zero parties.",
+                            QtWidgets.QMessageBox.Icon.Warning)
+            return
+
         election_data: dict[str, dict[str, int]] = self.election_table.generate_party_dict()
         electorates: int = 0
         election_method_factory = ElectionMethodFactory(election_data, self.seat_allocation.get_total_seats(),
@@ -97,16 +102,15 @@ class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
             electorates += party["electorates"]
 
         # Run elections
-        if self.seat_allocation.get_electorates() == electorates:
-            method = election_method_factory.create_election_method()
-            results = method.calculate_election(method.calculate_seats())
-
-            self.election_table.display_election(results)
-
-        else:
+        if self.seat_allocation.get_electorates() != electorates:
             gen_message_box("Invalid electorate number!", "The number of electorates for the election does not match "
-                                                          "the number of electorates earned by parties.",
-                                                          QtWidgets.QMessageBox.Icon.Warning)
+                            "the number of electorates earned by parties.", QtWidgets.QMessageBox.Icon.Warning)
+            return
+
+        method = election_method_factory.create_election_method()
+        results = method.calculate_election(method.calculate_seats())
+
+        self.election_table.display_election(results)
 
     def set_options(self, _options: dict[str, dict]):
         self.options = _options["names"]
